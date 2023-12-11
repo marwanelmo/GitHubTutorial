@@ -2,13 +2,11 @@ import streamlit as st
 import openai
 import key
 
-openai.api_key = key.key
-print(key.key)
-
+openai.api_key = key.key # Hier moet de API key komen
 
 
 # Add a dropdown menu to the sidebar
-menu = st.sidebar.selectbox("Select functionality:", ["Write report", "Simplify text", "Find ICD Code"])
+menu = st.sidebar.selectbox("Select functionality:", ["Write report", "Simplify text", "Find ICD Code", "Find ICF Code"])
 
 if menu == "Write report":
     # Display a text area for the user to enter short sentences about the patient
@@ -51,7 +49,7 @@ elif menu == "Simplify text":
         response = openai.Completion.create(
             engine="text-davinci-002",
             prompt=f"Please simplify the following text to a level that a 12 year old can understand: {text_input}",
-            max_tokens=50,
+            max_tokens=250,
             n=1,
             temperature=0.5,
         )
@@ -79,10 +77,30 @@ elif menu == "Find ICD Code":
         response = openai.Completion.create(
             engine="text-davinci-002",
             prompt=f"Give me a list of ICD codes with an explanation corresponding to the following medical scenario: {text_input}",
-            max_tokens=50,
+            max_tokens=200,
             n=1,
             temperature=0.5
         )
         icdtext = response["choices"][0]["text"]
         st.write("ICD codes:", icdtext)
+elif menu == "Find ICF Code":
+    st.write("""
+    ICD codes (International Classification of Diseases codes) are codes that are used to classify and describe medical diagnoses and procedures. They are used by healthcare providers, insurance companies, and other organizations to record and track medical information.
+    
+    A "find ICD code" feature could be a tool that allows users to search for the appropriate ICD code for a specific diagnosis or procedure. The feature could allow users to enter the name of the diagnosis or procedure, and it could use a database of ICD codes to provide the corresponding code. This could be especially useful for healthcare providers, who may need to accurately record and report ICD codes for billing and documentation purposes.
+    
+    The feature could also include additional functionality, such as the ability to browse through the full list of ICD codes, view the definitions and descriptions of each code, or search for codes based on keywords or other criteria.
+    """)
+    text_input = st.text_area("Enter Patient Scenario:")
+    button = st.button("Find ICD")
 
+    if button:
+        response = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=f"Give me a list of codes from interntional classification of functioning from the WHO corresponding to the following medical scenario: {text_input}",
+            max_tokens=200,
+            n=1,
+            temperature=0.5
+        )
+        icdtext = response["choices"][0]["text"]
+        st.write("ICF codes:", icdtext)
